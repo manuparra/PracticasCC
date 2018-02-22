@@ -70,7 +70,7 @@ Se han cargado unas imagenes específicas con las distribuciones de Linux más c
 Para las prácticas usaremos de forma indistinta: *CirrOS, Fedora27 (yum), Ubuntu16 (apt-get), CentOS7(yum) y CoreOS*.
 
 
-## Creación de credenciales de usuario (par de claves)
+### Creación de credenciales de usuario (par de claves)
 
 Para poder conectar y acceder por SSH a las intancias que se creen desde OpenStack, es necesario crear un par de claves para la autenticación. Para ello vamos al menú: *Project -> Compute --> Access & Security* y luego la pestaña *KeyPairs*:
 
@@ -86,14 +86,24 @@ Esto automáticamente creará un par de claves que podremos usar para poder cone
 
 Al crear el par de claves, se nos descargará un fichero ``nombre.pem`` que contiene nuestras llave de autenticación que más tarde usaremos.
 
-## Topología de red
+
+
+### Creación de fichero de autenticacion de usuario (RC file)
+
+Para poder interactuar con OpenStack desde el shell, es necesario descargar el fichero de la autenticación del usuario que luego copiaremos a nuestra cuenta en el servidor. Para ello vamos al menú: *Project -> Compute --> Access & Security* y luego la pestaña *API access*:
+
+![KeyPair](imgs/api_access.png)
+
+Para crear el fichero de autenticación de usuario utilizamos la opción ``Download OpenStack RC File v2.0``. Esto descargará en tu navegador el fichero que contiene el script de autenticación para la sesión de OpenStack desde el shell del servidor. El fichero que se descargará sera de la forma: ``CCproject_USUARIO-openrc.sh``.
+
+### Topología de red
 
 Cada alumno, tendrá asignado un conjunto de direcciones IP en las que podrá desplegar Máquinas Virtuales.  Estas IPs serán de la forma ``192.168.0.XXX``. 
 Para ver la configuración de red : *Project -> Network --> Network Topology*. 
 
 ![Network Topology](imgs/network_topology.png)
 
-## Creación de instancias
+### Creación de instancias
 
 Para la creación de una instancia, nos vamos a la opción: *Project -> Compute --> Instances*:
 
@@ -156,7 +166,285 @@ Esta pantalla nos permite ver el LOG de arranque de la Instancia, lo cual es muy
 
 Para conectar con la instancia SIN USAR ssh, a través de QEMU, podemos usar la consola web para verificar que todo está correcto en la MV. No es la mejor opción para interactuar con la MV creada, ya que el tiempo de respuesta es alto. Esta opción simplemente es para poder realizar alguna gestión sin tener que conectar por SSH a la MV.
 
+## Gestión de OpenStack desde el shell
 
+
+### Inicio de la sesión en el shell
+
+Para poder utilizar OpenStack desde el shell son necesarias 3 cosas:
+
+- Copiar la llave ``.pem`` que se generó en el apartado *Creación de credenciales de usuario (par de claves)*
+- Copiar la el fichero de autenticación de la sesion en OpenStack que se ha creado en el apartado *Creación de fichero de autenticacion de usuario (RC file)*
+- Conectar por SSH a atcstack.ugr.es
+
+
+Lo primero que hacemos es copiar los dos ficheros con nuestra llave y script de autenticacion a la cuenta en atcstack.ugr.es. Para ello:
+
+- Abre una nueva consola en tu PC.
+- Localiza el fichero PEM y el fichero del script de autenticacion (por defecto en tu carpeta Descargas/Downloads).
+
+y ahora :
+
+- Copia el fichero PEM: 
+
+```
+scp fichero.pem tuusuario@atcstack.ugr.es
+```
+
+- Copia el fichero de autenticación: 
+
+```
+scp CCproject_USUARIO-openrc.sh tuusuario@atcstack.ugr.es
+```
+
+
+Hecho esto conectamos con SSH al servidor atcstack.ugr.es:
+
+```
+ssh tuusuario@atcstack.ugr.es
+```
+
+Usamos el comando ``ls -l`` y vemos que efectivamente los ficheros copiados están disponibles.
+
+
+
+
+### Autenticación en OpenStack vía Shell
+
+Previamente tenemos que haber conectado al cluster:
+
+```
+ssh tuusuario@atcstack.ugr.es
+```
+
+Para poder usar autenticar en la session  de OpenStack desde el shell, hacemos:
+
+```
+source CCproject_USUARIO-openrc.sh
+```
+
+Esto nos pedirá nuestra clave de usuario de OpenStack. Una vez validado el usuario, ya podemos utilizar OpenStack desde el shell.  Para comprobar que todo es correcto:
+
+```
+openstack image list
+```
+
+El resultado deberá mostrar la lista de imagenes que hay disponibles en la plataforma.
+
+### Identificación de los elementos en OpenStack
+
+Es importante saber que para referenciar elementos en OpenStack se hace utilizando el ``ID`` o el ``Name`` de cada componente. Por ejemplo al hacer un listado de las imágenes disponibles en OpenStack, nos muestra el ``ID`` o el ``Name``, ambos identificadores son válidos para usarlos en la definición de opciones de otros comandos de OpenStack.
+
+### Gestionar las imágenes
+
+Para ello usamos:
+
+```
+openstack image OPCIONES
+```
+
+Listado de imágenes completo:
+
+
+```
+openstack image list
+```
+
+
+### Gestionar las redes e IPs
+
+Para ello usamos:
+
+```
+openstack network OPCIONES
+```
+
+Listado de redes disponibles:
+
+```
+openstack network list
+```
+
+### Gestionar los grupos de seguridad
+
+Para ello usamos:
+
+```
+openstack security group OPCIONES
+```
+
+Listado de los grupos de seguridad disponibles:
+
+
+```
+openstack security group list
+```
+
+
+### Gestionar los Flavor
+
+Para ello usamos:
+
+```
+openstack flavor OPCIONES
+```
+
+Listado de flavor:
+
+
+```
+openstack flavor list
+```
+
+
+### Gestionar los pares de claves
+
+
+
+Para ello usamos:
+
+```
+openstack keypair OPCIONES
+```
+
+Listado de claves:
+
+```
+openstack keypair list
+```
+
+
+
+### Crear un instancia
+
+Para crear una instancia, hay que tener en cuenta que como mínimo necesitamos conocer los ``ID`` de los siguientes componentes antes de usar el comando de creación de instancias:
+
+- El ``ID`` de la imagen de Sistema Operativo que se desplegará.
+- El ``ID`` del flavor que vamos a utilizar.
+- El ``ID`` de la RED que usaremos.
+- El ``ID`` del grupo de seguridad que aplicaremos.
+- El ``ID`` o ``Name`` del keypair que se usará.
+
+Una vez tengamos todos estos ``ID`` ya podemos lanzar el siguiente comando (ejemplo):
+
+```
+openstack server create --flavor XXXXX --image XXXXXX  --nic net-id=XXXXXXX --security-group XXXXXX  --key-name XXXXXXX MI_INSTANCIA
+```
+
+El nombre de la instancia viene definido por MI_INSTANCIA, por lo que debes modificar ese valor al que desees.
+
+Al ejecutarlo, obtenemos el resultado del despliegue:
+
+<IMAGEN>
+
+### Crear un instancia con una IP estática
+
+Para crear una instancia con una IP estatica, consulta la tabla de asignaciones de IP para cada alumno. Esto permitirá crear una instancia con una IP concreta y que no sea dinámica como hasta ahora lo hace automáticamente OpenStack en la configuración por defecto de nuestra plataforma.
+
+Para crear una instancia, hay que tener en cuenta que como mínimo necesitamos conocer los ``ID`` de los siguientes componentes antes de usar el comando de creación de instancias:
+
+- El ``ID`` de la imagen de Sistema Operativo que se desplegará.
+- El ``ID`` del flavor que vamos a utilizar.
+- El ``ID`` de la RED que usaremos.
+- El ``ID`` del grupo de seguridad que aplicaremos.
+- El ``ID`` o ``Name`` del keypair que se usará.
+
+Una vez tengamos todos estos ``ID`` ya podemos lanzar el siguiente comando, teniendo en cuenta la opción ``v4-fixed-ip`` donde se especifica la IP concreta que tendrá la instancia.
+
+```
+openstack server create --flavor XXXXX --image XXXXXX  --nic net-id=XXXXXX,v4-fixed-ip=192.168.0.XXX --security-group XXXXXX  --key-name XXXXXXX MI_INSTANCIAIP
+```
+	
+
+### Consultar instancias
+
+Para consultar instancias utilizamos:
+
+Listado de claves:
+
+```
+openstack server list
+```
+
+Para ver en detalle todos los aspectos de la instancia utilizamos:
+
+
+```
+openstack server show <ID/Name>
+```
+
+### Gestionar las instancias (estados y acciones)
+
+Estados de las instancias:
+
+![estados](https://docs.openstack.org/nova/latest/_images/graphviz-9808234d14264ae1335b53093f1ef6bf30ed2de5.png)
+
+
+Pausado de la instancia. Esto almacenrá el estado de la instancia en la RAM y parará la MV.
+
+```
+openstack server pause <ID/Name>
+```
+
+Para volver a restaurar el estado anterior:
+
+```
+openstack server unpause <ID/Name>
+```
+
+Suspendido de la instancia. Esto almacerá el estado de la MV y los datos en disco y para la MV. Esta acción libera la CPU y la RAM ocupada por la Mv. Al reanudar la instancia, adquiere de nuevo los recursos.
+```
+openstack server suspend <ID/Name>
+```
+
+Reanudación de la instancia desde el estado de suspendida o pausada:
+```
+openstack server resume <ID/Name>
+```
+
+Borrado de una instancia. Elimina por completo la instancia:
+
+```
+openstack server delete <ID/Name>
+```
+
+Crear un snapshot del volumen de la instancia:
+
+```
+openstack volume snapshot create --volume <IDVOLUME> --force NOMBRESNAPSHOT
+```
+
+Previamente debemos ver los volúmenes que tenemos activos:
+
+```
+openstack volume list
+```
+
+Para borrar un volumen:
+
+```
+openstack volume delete <ID/Name>
+```
+
+### Acceso SSH a las instancias
+
+Para acceder a todas las instancias que hemos creado, previamente debemos tener copiado en nuestro $HOME de atcstack el fichero ``.pem`` correspondiente. 
+
+Hay que cambiar los permisos del fichero ``.pem`` antes de usarlo con ssh:
+
+```
+chmod 400 fichero.pem
+```
+
+El acceso desde dentro de ATCSTACK se realiza del siguiente modo (usa como usuario, el correspondiente de cada imagen: en CirrOS es ``cirros``, en fedora27 es ``fedora``)
+
+```
+ssh -i fichero.pem root@192.168.0.XXX
+```
+
+(donde 192.168.0.XXX corresponderá con la IP que la instancia tiene asignada (``openstack server list`` para verlo))
+
+*NO* preguntará por la clave de acceso a la instancia.
 
 
 
