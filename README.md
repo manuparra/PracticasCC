@@ -505,7 +505,7 @@ chmod 400 fichero.pem
 El acceso desde dentro de ATCSTACK se realiza del siguiente modo (usa como usuario, el correspondiente de cada imagen: en CirrOS es ``cirros``, en fedora27 es ``fedora``)
 
 ```
-ssh -i fichero.pem root@192.168.0.XXX
+ssh -i fichero.pem fedora@192.168.0.XXX
 ```
 
 (donde 192.168.0.XXX corresponderá con la IP que la instancia tiene asignada o de la que se ha generado (``openstack server list`` para verlo))
@@ -514,9 +514,98 @@ ssh -i fichero.pem root@192.168.0.XXX
 
 
 
+## Ejercicio práctico A (instalación de servicios de forma manual)
+
+Una vez que ya puedes acceder a las instancias, vamos a instalarle algún servicio que se pueda consultar desde el exterior. Para ello, dentro de una de las instancias creadas, instalaremos APACHE y PHP.
+
+Accedemos a nuestra instancia:
+
+```
+ssh -i fichero.pem fedora@192.168.0.XXX
+```
 
 
+Instalamos el software:
 
+```
+sudo yum -y install httpd
+sudo yum -y install php
+```
+
+
+Abrimos los puertos localmente en la Instancia:
+
+```
+sudo firewall-cmd --permanent --add-port=80/tcp
+sudo firewall-cmd --permanent --add-port=443/tcp
+sudo firewall-cmd --reload
+```
+
+Habilitamos el servicio:
+
+```
+sudo systemctl start httpd
+sudo systemctl enable httpd
+```
+
+Ahora hay que añadir en las reglas del grupo de seguridad el acceso desde y hacia el puerto 80 para nuestras instancias en OpenStack. Para ello, hay que ir al interfaz web:
+
+Vamos al menú: *Project -> Compute --> Access & Security* y luego la pestaña *Security Groups*:
+
+![security_groups](imgs/security_groups.png)
+
+Una vez ahí pinchamos en el grupo ``default`` y en ``Manage Rules``:
+
+![rules](imgs/rules.png)
+
+Añadimos una nueva regla que permita la entrada y salida de trafico de red desde y hacia el puerto 80.
+
+
+## Ejercicio práctico B (instalación de servicios utilizando cloud-init)
+
+Notas sobre cloud-init : https://cloudinit.readthedocs.io/
+
+CloudInit soporta muchos formatos de entrada para datos de usuario. Sólo tendremos en cuenta ahora dos:
+
+- Scripts (comienzan con ``#!``)
+- Cloud Config Files (comienzan con ``#cloud-config``)
+
+### Script
+
+```
+#!/bin/bash
+
+ yum -y install httpd
+ yum -y install php
+ firewall-cmd --permanent --add-port=80/tcp
+ firewall-cmd --permanent --add-port=443/tcp
+ firewall-cmd --reload
+ systemctl start httpd
+ systemctl enable httpd
+```
+
+### Cloud-Init
+
+Un ejemplo de instalación de paquetes de apache y php:
+
+```
+#cloud-config
+packages:
+  - httpd
+  - php
+runcmd:
+  - [ systemctl, enable, httpd.service ]
+  - [ systemctl, start, httpd.service ]
+```
+
+
+### Lanzar la instancia con inyección de software:
+
+Utiliza la opción ``user-data=fichero_cloud_init`` en la llamada a crear la instancia:
+
+```
+openstack server create .... user-data=fichero_cloud_init ...
+```
 
 
 
