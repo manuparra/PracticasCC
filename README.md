@@ -601,10 +601,10 @@ runcmd:
 
 ### Lanzar la instancia con inyección de software:
 
-Utiliza la opción ``user-data=fichero_cloud_init`` en la llamada a crear la instancia:
+Utiliza la opción ``--user-data fichero_cloud_init`` en la llamada a crear la instancia:
 
 ```
-openstack server create .... user-data=fichero_cloud_init ...
+openstack server create .... --user-data fichero_cloud_init ...
 ```
 
 
