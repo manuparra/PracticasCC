@@ -1,5 +1,42 @@
 # OpenStack
 
+Tabla de contenido:
+
+  * [Requisitos iniciales](#requisitos-iniciales)
+  * [Credenciales y acceso inicial](#credenciales-y-acceso-inicial)
+  * [Acceso vía WEB](#acceso-v-a-web)
+  * [Acceso vía SSH](#acceso-v-a-ssh)
+  * [Gestión de OpenStack desde Horizon](#gesti-n-de-openstack-desde-horizon)
+    + [Pantalla inicial](#pantalla-inicial)
+    + [Gestión de imagenes](#gesti-n-de-imagenes)
+    + [Creación de credenciales de usuario (par de claves)](#creaci-n-de-credenciales-de-usuario--par-de-claves-)
+    + [Crear reglas del grupo de seguridad](#crear-reglas-del-grupo-de-seguridad)
+    + [Creación de fichero de autenticacion de usuario (RC file)](#creaci-n-de-fichero-de-autenticacion-de-usuario--rc-file-)
+    + [Topología de red](#topolog-a-de-red)
+    + [Creación de instancias](#creaci-n-de-instancias)
+  * [Gestión de OpenStack desde el shell](#gesti-n-de-openstack-desde-el-shell)
+    + [Inicio de la sesión en el shell](#inicio-de-la-sesi-n-en-el-shell)
+    + [Autenticación en OpenStack vía Shell](#autenticaci-n-en-openstack-v-a-shell)
+    + [Identificación de los elementos en OpenStack](#identificaci-n-de-los-elementos-en-openstack)
+    + [Gestionar las imágenes](#gestionar-las-im-genes)
+    + [Gestionar las redes e IPs](#gestionar-las-redes-e-ips)
+    + [Gestionar los grupos de seguridad](#gestionar-los-grupos-de-seguridad)
+    + [Gestionar los Flavor](#gestionar-los-flavor)
+    + [Gestionar los pares de claves](#gestionar-los-pares-de-claves)
+    + [Crear un instancia](#crear-un-instancia)
+    + [Crear un instancia con una IP estática](#crear-un-instancia-con-una-ip-est-tica)
+    + [Consultar instancias](#consultar-instancias)
+    + [Gestionar las instancias (estados y acciones)](#gestionar-las-instancias--estados-y-acciones-)
+    + [Acceso SSH a las instancias](#acceso-ssh-a-las-instancias)
+  * [Ejercicio práctico A (instalación de servicios de forma manual)](#ejercicio-pr-ctico-a--instalaci-n-de-servicios-de-forma-manual-)
+  * [Ejercicio práctico B (instalación de servicios utilizando cloud-init)](#ejercicio-pr-ctico-b--instalaci-n-de-servicios-utilizando-cloud-init-)
+    + [Script](#script)
+    + [Cloud-Init](#cloud-init)
+    + [Lanzar la instancia con inyección de software:](#lanzar-la-instancia-con-inyecci-n-de-software-)
+
+
+
+
 ## Requisitos iniciales
 
 - Tener cuenta de acceso a atcstack.ugr.es.
