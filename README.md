@@ -1,4 +1,9 @@
-# OpenStack
+Asignatura Cloud Computing del Máster en Ingeniería Informática. Universidad de Granada.
+
+Profesor: Manuel J. Parra-Royón
+Email: manuelparra@decsai.ugr.es
+
+# Sesión 1: OpenStack
 
 Tabla de contenido:
 
