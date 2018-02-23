@@ -12,6 +12,7 @@ Email: **manuelparra@decsai.ugr.es**
 
 Tutorías: **Viernes, de 17:30 a 18:30, despacho D31 (4ª planta) Escuela Técnica Superior de Ingenierías Informática y de Telecomunicación (ETSIIT).**
 
+Material de prácticas de la asignatura: **https://github.com/manuparra/PracticasCC**
 
 <HR>
 
