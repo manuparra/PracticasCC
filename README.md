@@ -1,7 +1,15 @@
-Asignatura Cloud Computing del Máster en Ingeniería Informática. Universidad de Granada.
+Asignatura Cloud Computing del Máster en Ingeniería Informática. 
 
-Profesor: Manuel J. Parra-Royón
-Email: manuelparra@decsai.ugr.es
+Departamento de Ciencias de la Computación e Inteligencia Artificial.
+
+Universidad de Granada.
+
+
+Profesor: **Manuel J. Parra-Royón**
+
+Email: **manuelparra@decsai.ugr.es**
+
+Tutorías: **Viernes, de 17:30 a 18:30, despacho D31 (4ª planta) Escuela Técnica Superior de Ingenierías Informática y de Telecomunicación (ETSIIT).**
 
 # Sesión 1: OpenStack
 
