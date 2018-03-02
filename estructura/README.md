@@ -32,9 +32,11 @@ Cada usuario tiene disponible un rango de direcciones IP locales para asignarlo 
 
 Cada puerto externo está asociado a una IP local y al puerto 80 de esa IP local, de modo que el esquema grafico de una conexión sería:
 
+*Recuerda que debes estar conectado a la VPN para acceder al cluster de openstack.*
+
 
 ```
-Usuario <----> puerto 20002 <-----> ATCSTACK <----> 192.168.0.112:80
+Usuario <-----> puerto 20002 <-----> ATCSTACK <-----> 192.168.0.112:80
 ```
 
 Esto hace que tengamos que tener en cuenta que hay que abrir el puerto 80 de la Máquina Virtual que corresponda y además añadir la política de seguridad y regla concreta para que esté disponible este puerto.
@@ -42,10 +44,9 @@ Esto hace que tengamos que tener en cuenta que hay que abrir el puerto 80 de la 
 
 # Rango de IPs para los usuarios
 
-
 Cada usuario tiene asignado un rango de puertos externos y un rango de IP correspondiente y asociado a esos puertos.
 
-Para evitar que varios usuarios usen la misma IP, hay siempre que revisar el listado de IPs propias y lanzar las instancias dentro del rango de IP asignado a cada usuaro.
+Para evitar que varios usuarios usen la misma IP, hay siempre que revisar el listado de IPs propias y lanzar las instancias dentro del rango de IP asignado a cada usuario.
 
 - Usuario *CC_....52*
  - Puerto externo: ``20000`` ---> ``192.168.0.110``
@@ -112,3 +113,5 @@ Para evitar que varios usuarios usen la misma IP, hay siempre que revisar el lis
  - Puerto externo: ``20049`` ---> ``192.168.0.159``
  - Puerto externo: ``20050`` ---> ``192.168.0.160``
  - Puerto externo: ``20051`` ---> ``192.168.0.161``
+
+

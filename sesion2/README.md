@@ -254,7 +254,50 @@ Ya está instalado NGINX, pero no está iniciado en la MV, por lo que tenemos qu
      service: name=nginx state=restarted enabled=yes
 ```
 
+Ahora instalamos Apache en la misma máquina pero en un puerto diferente:
 
-##
+```
+---
+- hosts: MVs
+  become: true
+  tasks:
+    - name: install apache2
+      package: name=apache2 state=latest
+
+    - name: enabled mod_rewrite
+      apache2_module: name=rewrite state=present
+      notify:
+        - restart apache2
+
+    - name: apache2 listen on port 8081
+      lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen 80" line="Listen 8081" state=present
+      notify:
+        - restart apache2
+
+    - name: apache2 virtualhost on port 8081
+      lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:80>" line="<VirtualHost *:8081>" state=present
+      notify:
+        - restart apache2
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+```
+
+
+### Despliegue de servicios relacionados con la práctica
+
+Para la primera práctica necesitaremos una serie de servicios que se habilitarán desde las instancias que se provee.
+
+Estas instancias deben contener un software específico para cada servicio que se despliega en ellas y que servirá para 
+
+Necesitaremos instalar en instancias separadas:
+
+- Nodo de cabecera (1 nodo):
+ - NGINX o HAproxy
+- Nodos de servicio (1-2 nodos):
+ - Servicio de contenedores (docker)
+- Nodo de Base de Datos (1 nodo)
+- Nodo para autenticacion (1 nodo)
 
 
