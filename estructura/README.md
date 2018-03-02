@@ -21,7 +21,7 @@ Material de prácticas de la asignatura: **https://github.com/manuparra/Practica
 
 La estructura de red que disponemos para las prácticas es la siguiente:
 
-![Puertos](./imgs/estructurapuertos.png)
+![Puertos](../imgs/estructurapuertos.png)
 
 Se compone de dos partes:
 
