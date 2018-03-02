@@ -616,7 +616,6 @@ Una vez ahí pinchamos en el grupo ``default`` y en ``Manage Rules``:
 
 Añadimos una nueva regla que permita la entrada y salida de trafico de red desde y hacia el puerto 80.
 
-
 ## Ejercicio práctico B (instalación de servicios utilizando cloud-init)
 
 Notas sobre cloud-init : https://cloudinit.readthedocs.io/
@@ -631,14 +630,21 @@ CloudInit soporta muchos formatos de entrada para datos de usuario. Sólo tendre
 ```
 #!/bin/bash
 
- yum -y install httpd
- yum -y install php
- firewall-cmd --permanent --add-port=80/tcp
- firewall-cmd --permanent --add-port=443/tcp
- firewall-cmd --reload
- systemctl start httpd
- systemctl enable httpd
+yum -y install httpd
+yum -y install php
+systemctl start httpd
+systemctl enable httpd
 ```
+
+
+Para este script por ejemplo si se llama ```apache.sh```:
+
+```
+openstack server create --flavor XXXXX --image XXXXXX  --nic net-id=XXXXXX,v4-fixed-ip=192.168.0.XXX --security-group XXXXXX  --key-name XXXXXXX MI_INSTANCIAIP --user-data apache.sh
+```
+
+
+
 
 ### Cloud-Init
 
@@ -650,8 +656,14 @@ packages:
   - httpd
   - php
 runcmd:
-  - [ systemctl, enable, httpd.service ]
-  - [ systemctl, start, httpd.service ]
+  - [ systemctl, enable, httpd ]
+  - [ systemctl, start, httpd ]
+```
+
+Para este script por ejemplo si se llama ```apache.cinit```:
+
+```
+openstack server create --flavor XXXXX --image XXXXXX  --nic net-id=XXXXXX,v4-fixed-ip=192.168.0.XXX --security-group XXXXXX  --key-name XXXXXXX MI_INSTANCIAIP --user-data apache.cinit
 ```
 
 

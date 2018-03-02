@@ -17,9 +17,28 @@ Material de prácticas de la asignatura: **https://github.com/manuparra/Practica
 <HR>
 
 
+
 # Sesión 2: Despliegue automatizado de software y servicios 
 
 Tabla de contenido:
+
+  * [Requisitos iniciales](#requisitos-iniciales)
+  * [Credenciales y acceso inicial](#credenciales-y-acceso-inicial)
+  * [Acceso vía WEB](#acceso-v-a-web)
+  * [Acceso vía SSH](#acceso-v-a-ssh)
+  * [Despliegue automatico de servicios y software](#despliegue-automatico-de-servicios-y-software)
+  * [Breve introducción a ANSIBLE](#breve-introducci-n-a-ansible)
+    + [Elementos en ANSIBLE:](#elementos-en-ansible-)
+    + [Instalación de ANSIBLE](#instalación-de-ansible)
+    + [Definición del fichero de inventario](#definición-del-fichero-de-inventario)
+    + [PlayBooks básicos](#playbooks-básicos)
+  * [Despliegue de software y servicios sobre MV](#despliegue-de-software-y-servicios-sobre-mv)
+    + [Creamos el fichero de inventario](#creamos-el-fichero-de-inventario)
+    + [Instalamos un servicio web](#instalamos-un-servicio-web)
+  * [Despliegue de servicios relacionados con la práctica del curso](#despliegue-de-servicios-relacionados-con-la-práctica-del-curso)
+
+
+
 
 ## Requisitos iniciales
 
@@ -44,7 +63,7 @@ Para ambos es necesario utilizar las mismas credenciales de acceso.
 Para acceder vía web, utilizamos un navegador para la dirección:  http://atcstack.ugr.es/dashboard/auth/login/?next=/dashboard/
 
 
-![LoginON](imgs/login_on.png)
+![LoginON](../imgs/login_on.png)
 
 Por defecto en Domain, usamos ``default``
 
@@ -102,6 +121,21 @@ Las Tareas en ANSIBLE son identificables. Sin una gran cantidad de codificación
 
 Ansible usa estos hechos para comprobar el estado y ver si necesita cambiar algo para obtener el resultado deseado. Esto hace que sea seguro ejecutar Ansible Tasks contra un servidor una y otra vez.
 
+
+### Elementos en ANSIBLE:
+
+- Controller Machine: la máquina donde Ansible está instalado, responsable de ejecutar el aprovisionamiento en los servidores que está gestionando.
+- Inventario: un archivo INI que contiene información sobre los servidores que está gestionando.
+- Playbook: el punto de entrada para aprovisionamientos Ansible, donde la automatización se define a través de tareas con formato YAML.
+- Tarea: bloque que define un procedimiento único a ejecutar, por ejemplo: instalar un paquete.
+- Módulo: un módulo suele resumir una tarea del sistema, como tratar con paquetes o crear y cambiar archivos. Ansible tiene una multitud de módulos incorporados, pero también puede crear otros personalizados.
+- Rol: una forma predefinida de organizar playbooks y otros archivos para facilitar el compartir y reutilizar partes de un aprovisionamiento.
+- Hechos: variables globales que contienen información sobre el sistema, como interfaces de red o sistema operativo.
+- Manipuladores: se utilizan para desencadenar cambios en el estado de servicio, como reiniciar o detener un servicio.
+
+
+
+
 ### Instalación de ANSIBLE
 
 En el nodo principal de atcstack.ugr.es ya está instalado ANSIBLE, con lo que no tendrás que instalarlo.
@@ -153,7 +187,20 @@ Lo desgranamos:
 ¿Cómo lo ejecutamos?:
 
 ```
-ansible-playbook -s nginx.yml
+ansible-playbook -s nginx.yml 
+```
+
+Otro ejemplo para instalar APACHE y PHP:
+
+```
+---
+- hosts: local
+  become: true
+  tasks:
+   - name: Install Apache
+     yum: pkg=httpd state=installed 
+   - name: Install Apache
+     yum: pkg=php state=installed 
 ```
 
 
@@ -173,8 +220,19 @@ Para crear una instancia, hay que tener en cuenta que como mínimo necesitamos c
 
 Una vez tengamos todos estos ``ID`` ya podemos lanzar el siguiente comando, teniendo en cuenta la opción ``v4-fixed-ip`` donde se especifica la IP concreta que tendrá la instancia.
 
+Para poder usar ansible con la imagen de FEDORA27, es necesario añadir la directiva ```--user-data``` yun fichero que haga un ```update`` de los paquetes:
+
+Crea un fichero ```update.sh```, que contenga:
+
 ```
-openstack server create --flavor XXXXX --image XXXXXX  --nic net-id=XXXXXX,v4-fixed-ip=192.168.0.XXX --security-group XXXXXX  --key-name XXXXXXX MI_INSTANCIAIP
+#!/bin/bash
+yum -y update
+```
+
+y añadelo a la directiva ```--user-data```:
+
+```
+openstack server create --flavor XXXXX --image XXXXXX  --nic net-id=XXXXXX,v4-fixed-ip=192.168.0.XXX --security-group XXXXXX  --key-name XXXXXXX MI_INSTANCIAIP --user-data 'update.sh'
 ```
 
 Nos conectamos a ella:
@@ -203,9 +261,11 @@ y añadimos el siguiente contenido:
 192.168.0.110 ansible_ssh_private_key_file=tuficherokey.pem  ansible_connection=ssh ansible_user=fedora
 ```
 
-y guardamos el fichero
+Sustituye la IP ``192.168.0.110``, por la correspondiente de tu instancia.
 
-Explicamos:
+y guardamos el fichero.
+
+Explicamos el contenido del fichero:
 
 - Grupo de Hosts que se llama ```[MVs]```
 - Línea de hosts:
@@ -234,10 +294,10 @@ Creamos un fichero que se llame por ejemplo: ```nginx.yml``` y añadimos el sigu
 Y ahora ejecutamos:
 
 ```
-ansible-playbook -s nginx.yml
+ansible-playbook -s nginx.yml -i hosts
 ```
 
-Ya está instalado NGINX, pero no está iniciado en la MV, por lo que tenemos que añadir al fichero ``nginx.yml`` lo siguiente:
+Ya está instalado NGINX, pero no está iniciado en la MV, por lo que tenemos que añadir al fichero ``nginx.yml`` lo siguiente, un manejador:
 
 ```
 ---
@@ -254,40 +314,19 @@ Ya está instalado NGINX, pero no está iniciado en la MV, por lo que tenemos qu
      service: name=nginx state=restarted enabled=yes
 ```
 
-Ahora instalamos Apache en la misma máquina pero en un puerto diferente:
+
+Comprobamos que podemos ver la web que se ha despleglado:
 
 ```
----
-- hosts: MVs
-  become: true
-  tasks:
-    - name: install apache2
-      package: name=apache2 state=latest
-
-    - name: enabled mod_rewrite
-      apache2_module: name=rewrite state=present
-      notify:
-        - restart apache2
-
-    - name: apache2 listen on port 8081
-      lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen 80" line="Listen 8081" state=present
-      notify:
-        - restart apache2
-
-    - name: apache2 virtualhost on port 8081
-      lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:80>" line="<VirtualHost *:8081>" state=present
-      notify:
-        - restart apache2
-
-  handlers:
-    - name: restart apache2
-      service: name=apache2 state=restarted
+lynx 192.168.0.XXX
 ```
 
+*Recuerda abrir el puerto 80 en tus politicas de seguridad de grupo*
 
-### Despliegue de servicios relacionados con la práctica
 
-Para la primera práctica necesitaremos una serie de servicios que se habilitarán desde las instancias que se provee.
+## Despliegue de servicios relacionados con la práctica del curso
+
+Para la primera práctica necesitaremos una serie de servicios que se habilitarán desde las instancias que se crearán de forma programatica.
 
 Estas instancias deben contener un software específico para cada servicio que se despliega en ellas y que servirá para 
 
@@ -299,5 +338,8 @@ Necesitaremos instalar en instancias separadas:
  - Servicio de contenedores (docker)
 - Nodo de Base de Datos (1 nodo)
 - Nodo para autenticacion (1 nodo)
+
+
+
 
 
