@@ -79,7 +79,7 @@ Para ambos es necesario utilizar las mismas credenciales de acceso.
 Para acceder vía web, utilizamos un navegador para la dirección:  http://atcstack.ugr.es/dashboard/auth/login/?next=/dashboard/
 
 
-![LoginON](imgs/login_on.png)
+![LoginON](../imgs/login_on.png)
 
 Por defecto en Domain, usamos ``default``
 
@@ -111,7 +111,7 @@ Esta primera parte de guión nos centraremos en utilizar todo lo que nos ofrece 
 
 La primera vez que se acceder a OpenStack Horizon, se muestra la siguiente pantalla:
 
-![HorizonInicio](imgs/pantalla_inicio_horizon.png)
+![HorizonInicio](../imgs/pantalla_inicio_horizon.png)
 
 En ella se puede consultar el estado general de nuestra quota de instancias de Máquinas Virtuales y otros recursos que estamos consumiendo como CPUs, RAM o número de redes (IPs).
 
@@ -121,7 +121,7 @@ Para acceder a esta sección vamos al menú de la derecha: *Project -> Compute -
 
 Se han cargado unas imagenes específicas con las distribuciones de Linux más comunes y que nos permitirán desplegar cualquier software dentro de las prácticas:
 
-![Imagemes](imgs/imagenes.png)
+![Imagemes](../imgs/imagenes.png)
 
 Para las prácticas usaremos de forma indistinta: *CirrOS, Fedora27 (yum), Ubuntu16 (apt-get), CentOS7(yum) y CoreOS*.
 
@@ -130,11 +130,11 @@ Para las prácticas usaremos de forma indistinta: *CirrOS, Fedora27 (yum), Ubunt
 
 Para poder conectar y acceder por SSH a las intancias que se creen desde OpenStack, es necesario crear un par de claves para la autenticación. Para ello vamos al menú: *Project -> Compute --> Access & Security* y luego la pestaña *KeyPairs*:
 
-![KeyPair](imgs/keypair.png)
+![KeyPair](../imgs/keypair.png)
 
 Ahora creamos nuestro par de claves utilizando la opción: *Create Key Pair*.
 
-![CrearKeyPair](imgs/crearkeypair.png)
+![CrearKeyPair](../imgs/crearkeypair.png)
 
 Le asignamos un nombre y luego pulsamos en *Create Key Pair*
 
@@ -146,11 +146,11 @@ Al crear el par de claves, se nos descargará un fichero ``nombre.pem`` que cont
 
 Para poder conectar y acceder a las intancias y **a puertos en las instancias**, es necesario añadir las reglas al grupo de seguridad. Para ello vamos al menú: *Project -> Compute --> Access & Security* y luego la pestaña *Security Groups*:
 
-![security_groups](imgs/security_groups.png)
+![security_groups](../imgs/security_groups.png)
 
 Una vez ahí pinchamos en el grupo ``default`` y en ``Manage Rules``:
 
-![rules](imgs/rules.png)
+![rules](../imgs/rules.png)
 
 Y añadimos las reglas minímas necesarias para poder:
 
@@ -165,7 +165,7 @@ Recuerda que sin estas dos reglas, no puedes trabajar con las instancias.
 
 Por lo que después de aplicar estas reglas, tendremos en la lista lo siguiente:
 
-![rules](imgs/rules_after.png)
+![rules](../imgs/rules_after.png)
 
 Cualquier otro puerto que necesites, debes abrirlo desde aquí.
 
@@ -178,7 +178,7 @@ Cualquier otro puerto que necesites, debes abrirlo desde aquí.
 
 Para poder interactuar con OpenStack desde el shell, es necesario descargar el fichero de la autenticación del usuario que luego copiaremos a nuestra cuenta en el servidor. Para ello vamos al menú: *Project -> Compute --> Access & Security* y luego la pestaña *API access*:
 
-![KeyPair](imgs/api_access.png)
+![KeyPair](../imgs/api_access.png)
 
 Para crear el fichero de autenticación de usuario utilizamos la opción ``Download OpenStack RC File v3.0``. *[ NO usar la versión v2.0, ya que no es compatible al 100% con algunos módulos del shell de OpenStack ]*. 
 
@@ -189,27 +189,27 @@ Esto descargará en tu navegador el fichero que contiene el script de autenticac
 Cada alumno, tendrá asignado un conjunto de direcciones IP en las que podrá desplegar Máquinas Virtuales.  Estas IPs serán de la forma ``192.168.0.XXX``. 
 Para ver la configuración de red : *Project -> Network --> Network Topology*. 
 
-![Network Topology](imgs/network_topology.png)
+![Network Topology](../imgs/network_topology.png)
 
 ### Creación de instancias
 
 Para la creación de una instancia, nos vamos a la opción: *Project -> Compute --> Instances*:
 
-![Instancias](imgs/instancias.png)
+![Instancias](../imgs/instancias.png)
 
 Y usamos la opción ``Launch instance``. Antes de crear una instancia es necesario revisar varios aspectos de la creación de instancias:
 
-![Instancias](imgs/pantalla_instancias.png)
+![Instancias](../imgs/pantalla_instancias.png)
 
 - En esta pantalla se indicará el Nombre de la Instancia ``Instance name``. La zona de disponibilidad, por defecto dejaremos ``NOVA`` y en ``count`` pondremos ``1``.
 
 
-![Source](imgs/source.png)
+![Source](../imgs/source.png)
 
 - En esta pantalla se indicará la imagen que se usará para la Máquina Virtual que se desplegará. Para este primer ejemplo usaremos Fedora27. Con lo que hacemos click en el botón + para incluirla en el despliegue.
 
 
-![Source](imgs/flavor.png)
+![Source](../imgs/flavor.png)
 
 - La selección de un ``flavor`` es importante, ya que es el que nos permite asignarle los recursos a la Máquina Virtual que vamos a crear. Es importante tener en cuenta que el ``flavor`` asignado debe tener caracteristicas que se ajuste a la imagen que vamos a usar; por ejemplo si vamos a usar CentOS7 como imagen y está necesita como mínimo 512 MB de RAM y un espacio en disco de 10GB, tendremos que seleccionar un `flavor` que cubra como mínimo esas características. En caso de no ser así y asignar un `flavor` que no se ajusta, la instanciación de la Máquina Virtual dará error de recursos.
 - Para nuestro ejemplo con CentOS7 usamos el `flavor` :
@@ -218,15 +218,15 @@ Y usamos la opción ``Launch instance``. Antes de crear una instancia es necesar
 m2.medium	VCPU 2	RAM 1 GB	HD 20 GB
 ```
 
-![Redes](imgs/redes.png)
+![Redes](../imgs/redes.png)
 
 - La selección de redes ya viene indicada por defecto, por no es necesario indicar nada. Nuestra red por defecto se llama ``provider``.
 
-![Redes](imgs/security.png)
+![Redes](../imgs/security.png)
 
 - En la sección security por defecto ya viene marcado el grupo de seguridad ``default``. Esto indica que la creación de todas las Máquinas Virtuales, comparten un grupo de seguridad que define filtros y reglas de acceso IP y gestiona el flujo de tráfico de red desde y hacia la instancia.
 
-![instancia_keypair](imgs/instancia_keypair.png)
+![instancia_keypair](../imgs/instancia_keypair.png)
 
 - En pasos anteriores hemos creado un par de claves para conectar con nuestras instancias. Por defecto viene seleccionado el par de claves que hemos creado en pasos previos. Este par de claves será inyectado dentro de la instancia en tiempo de arranque.
 
@@ -236,21 +236,21 @@ El proceso de instanciación puede durar unos instantes y dependerá del `flavor
 
 La pantalla de gestión de instancias proporciona una visión global del estado de las mismas:
 
-![pantalla_instancias](imgs/pantalla_instancias.png)
+![pantalla_instancias](../imgs/pantalla_instancias.png)
 
 Para conocer los detalles de la instancia, hacemos clic en el nombre de la instancia: 
 
 
-![resumen_instancia](imgs/resumen_instancia.png)
+![resumen_instancia](../imgs/resumen_instancia.png)
 
 En esta pantalla se pueden conocer los aspectos detallados de la instancia como los recursos usados, la IP y redes asignadas, los puertos IN/OUT abiertos en la MV, etc. 
 
 
-![log_instancia](imgs/log_instancia.png)
+![log_instancia](../imgs/log_instancia.png)
 
 Esta pantalla nos permite ver el LOG de arranque de la Instancia, lo cual es muy útil para verificar que la creación de la instancia fue correcta y por ejemplo se le ha asignado bien la RED, o se ha instalado correctamente algún software. Desde esta pantalla no se puede interactuar con la MV, ya que es simplemente informativa. Para poder interactuar con la MV, sin tener que usar SSH, se utiliza la opción Console.
 
-![log_instancia](imgs/console_instancia.png)
+![log_instancia](../imgs/console_instancia.png)
 
 Para conectar con la instancia SIN USAR ssh, a través de QEMU, podemos usar la consola web para verificar que todo está correcto en la MV. No es la mejor opción para interactuar con la MV creada, ya que el tiempo de respuesta es alto. Esta opción simplemente es para poder realizar alguna gestión sin tener que conectar por SSH a la MV.
 
@@ -319,7 +319,7 @@ openstack image list
 
 El resultado será:
 
-![images_list](imgs/images_list.png)
+![images_list](../imgs/images_list.png)
 
 Se debe mostrar la lista de imagenes que hay disponibles en la plataforma.
 
@@ -357,7 +357,7 @@ Listado de redes disponibles:
 openstack network list
 ```
 
-![network_list](imgs/network_list.png)
+![network_list](../imgs/network_list.png)
 
 
 ### Gestionar los grupos de seguridad
@@ -375,7 +375,7 @@ Listado de los grupos de seguridad disponibles:
 openstack security group list
 ```
 
-![security_list](imgs/security_list.png)
+![security_list](../imgs/security_list.png)
 
 ### Gestionar los Flavor
 
@@ -392,7 +392,7 @@ Listado de flavor:
 openstack flavor list
 ```
 
-![flavor_list](imgs/flavor_list.png)
+![flavor_list](../imgs/flavor_list.png)
 
 
 ### Gestionar los pares de claves
@@ -411,7 +411,7 @@ Listado de claves:
 openstack keypair list
 ```
 
-![key_list](imgs/key_list.png)
+![key_list](../imgs/key_list.png)
 
 ### Crear un instancia
 
@@ -438,7 +438,7 @@ openstack server create --flavor 6630ad0e-55d7-4a44-805a-1a52c37341b3 --image 7c
 ```
 Al ejecutarlo, obtenemos el resultado del despliegue:
 
-![server_create](imgs/server_create.png)
+![server_create](../imgs/server_create.png)
 
 Ahora esperamos unos minutos y probamos a ver el estado de la creación de la instancia:
 
@@ -446,7 +446,7 @@ Ahora esperamos unos minutos y probamos a ver el estado de la creación de la in
 openstack server list
 ```
 
-![mv_status](imgs/mv_status.png)
+![mv_status](../imgs/mv_status.png)
 
 Lo que nos interesa en este listado es el estado de las MVs que hemos lanzado y la IP que se le ha asignado (DINÁMICA). Lee el documento https://docs.openstack.org/nova/latest/reference/vm-states.html, para conocer todos los estados posibles.
 
@@ -484,7 +484,7 @@ Listado de claves:
 openstack server list
 ```
 
-![mv_status](imgs/mv_status.png)
+![mv_status](../imgs/mv_status.png)
 
 Para ver en detalle todos los aspectos de la instancia utilizamos:
 
@@ -493,7 +493,7 @@ Para ver en detalle todos los aspectos de la instancia utilizamos:
 openstack server show <ID/Name>
 ```
 
-![mv_status_mv](imgs/status_mv.png)
+![mv_status_mv](../imgs/status_mv.png)
 
 ### Gestionar las instancias (estados y acciones)
 
@@ -608,11 +608,11 @@ Ahora hay que añadir en las reglas del grupo de seguridad el acceso desde y hac
 
 Vamos al menú: *Project -> Compute --> Access & Security* y luego la pestaña *Security Groups*:
 
-![security_groups](imgs/security_groups.png)
+![security_groups](../imgs/security_groups.png)
 
 Una vez ahí pinchamos en el grupo ``default`` y en ``Manage Rules``:
 
-![rules](imgs/rules.png)
+![rules](../imgs/rules.png)
 
 Añadimos una nueva regla que permita la entrada y salida de trafico de red desde y hacia el puerto 80.
 
