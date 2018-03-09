@@ -72,8 +72,7 @@ Si usas SSH desde una consola:
 
 ### Creación de script de inicio/parada y orquestación de MVs
 
-La primera parte de esta sesión se destinará a crear un **script** a través del cual se puedan crear las 
-MV a demanda, además de eliminarlas de una forma cómoda.
+La primera parte de esta sesión se destinará a explicar el desarrollo de un **script** a través del cual se puedan instanciar las MV a demanda, además de eliminarlas de una forma cómoda. Esto servirá para ir avanzando en la primera práctica del curso.
 
 El **script** recibirá los parámetros siguientes:
 
@@ -83,7 +82,52 @@ El **script** recibirá los parámetros siguientes:
 - Red a usar (nombre de Red)
 - Imagen a usar (nombre de la imagen)
 - Grupo de seguridad
-- Fichero de ANSIBLE para el software a desplegar
+- Fichero de CloudINIT (con update de paquetes, etc.) (opcional)
+- Fichero de ANSIBLE para el software a desplegar (opcional)
+
+Necesitarás conocer:
+
+- Programación en BASH o utilizar el lenguaje que más te guste
+- Instanciación de MV con OpenStack
+- Uso de Cloud-Init
+
+Un ejemplo de script.sh
+
+```
+#!/bin/bash
+
+#Accion
+accion = $1
+
+# Flavor
+flavor = $2
+
+...
+
+# Para cada una de las IPs que tenemos asignadas:
+
+openstack create server --flavor $flavor .... CC_MV_01_$name ... --user-data software.sh
+openstack create server --flavor $flavor .... CC_MV_02_$name ... --user-data software.sh
+
+```
+
+La llamada sería:
+
+```
+sh crearcluster.sh crear m1.medium MisMVs RedPredeterminada ....
+```
+
+Hay que tener en cuenta lo siguiente en el script:
+
+- Debe permitir **crear** las máquinas y **borrarlas**.
+- Debe crear 4 MVs cada una con su IP del rango propio de cada alumno.
+- El software instalado sera:
+  - MV1: Update de paquetes y NGINX.
+  - MV2: Update de paquetes y docker + owcloud en contenedor
+  - MV3: Update de paquetes y docker + owcloud en contenedor
+  - MV4: Update de paquetes y docker + (mysql y LDAP) en contenedor
+
+
 
 
 ## Contenedores con DOCKER
@@ -269,11 +313,19 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 Donde ``container ID`` es el único ID de su Contenedor. Puede utilizar el ID de contenedor o NOMBRES para referirse a su contenedor. ``IMAGE`` es el nombre de la imagen contenedor. "PORTS" muestra la correspondencia de los puertos entre el servidor y el contenedor docker.
 
 
-Y ahora, ve a tu navegador y escribe:
+Y ahora, ve a tu navegador y escribe (cuando este disponible):
 
 ```
-http://docker.ugr.es:<yourport>/
+http://atcstack.ugr.es:<yourport>/
 ```
+
+En caso contrario, usa tu sessión con X-Forwarding para SSH, con lo que tendrás que usar:
+
+```
+http://IPASIGNADAMV:<yourport>/
+```
+
+En ``<yourport>`` debes poner 80 si lo has dejado por defecto en el contenedor.
 
 ![nginxDocker](https://sites.google.com/site/manuparra/home/docker_nginx.png)
 
@@ -397,6 +449,31 @@ DOCKER tienen una gran capacidad de parametrización de los contenedores:
 
 Para esta parte borraremos la MV que hemos creado anteriormente y crearemos dos MV nuevas cada una con un servicios determinados instalados en contenedores.
 
+
+#### Maquina Virtual 1
+
+Esta MV contendrá DOCKER y un Contenedor ejecutandose con OWCLOUD en el puerto 80 (o HTTPS).
+
+Para comprobar que funciona ve a:
+
+- Si estás usando X-Forwarding a http://192.168.0...:80
+
+#### Maquina Virtual 2
+
+Esta MV contendrá DOCKER y un Contenedor ejecutandose con MYSQL en el puerto por defecto de MySQL.
+
+
+### Instalación del servicio completo OWNCLOUD + MYSQL
+
+Para ello tienes que tener en cuenta:
+
+- Qué IP has usado para OWNCLOUD
+- Qué IP has usado para MySQL / MariaDB
+
+Por lo que tienes que:
+
+- Acceder al servicio de OWNCLOUD en http://192.168.0.XXX
+- Asignarle en el SetUP de OWNLOUD el servidor de MySQL.
 
 
 
