@@ -40,7 +40,6 @@ Tabla de contenido:
       - [Maquina Virtual 1](#maquina-virtual-1)
       - [Maquina Virtual 2](#maquina-virtual-2)
     + [Instalación del servicio completo OWNCLOUD + MYSQL](#instalaci-n-del-servicio-completo-owncloud---mysql)
-  * [Despliegue de servicios relacionados con la práctica del curso](#despliegue-de-servicios-relacionados-con-la-pr-ctica-del-curso)
 
 
 
@@ -474,14 +473,40 @@ Para esta parte borraremos la MV que hemos creado anteriormente y crearemos dos 
 
 Esta MV contendrá DOCKER y un Contenedor ejecutandose con OWCLOUD en el puerto 80 (o HTTPS).
 
+```
+docker pull owncloud
+docker run -d -p 80:80 owncloud:8.1
+```
+
+**Recuerda cargar este despliegue en tu fichero ´´cloud-init´´ o en tu ``playbook`` de ansible.**
+
+**Además añade la regla en las politicas de seguridad del puerto correspondiente para servicio en la MV.**
+
+
 Para comprobar que funciona ve a:
 
-- Si estás usando X-Forwarding a http://192.168.0...:80
+- Si estás usando X-Forwarding para SSH usa firefox y pon `http://192.168.0...:80``
+- En caso contrario ve a tu navegador a ``http://atcstack.ugr.es:<tupuertoparatuMV>``
+
+Para ambos casos, verás algo como esto:
+
+![LoginON](../imgs/login_owncloud.png)
+
+Es la instalación de OwnCloud, donde necesitarás indicar una usuario administrador, clave y los parámetros de configuración de la Base de datos (que crearemos en la siguiente sección).
 
 #### Maquina Virtual 2
 
 Esta MV contendrá DOCKER y un Contenedor ejecutandose con MYSQL en el puerto por defecto de MySQL.
 
+Usa el contendor siguiente por ejemplo:
+
+```
+docker pull mysql/mysql-server
+docker run --name=mysql01 -d mysql/mysql-server:latest
+
+```
+
+Más información en: https://www.techrepublic.com/article/how-to-deploy-and-use-a-mysql-docker-container/
 
 ### Instalación del servicio completo OWNCLOUD + MYSQL
 
@@ -496,21 +521,6 @@ Por lo que tienes que:
 - Asignarle en el SetUP de OWNLOUD el servidor de MySQL.
 
 
-
-## Despliegue de servicios relacionados con la práctica del curso
-
-Para la primera práctica necesitaremos una serie de servicios que se habilitarán desde las instancias que se crearán de forma programatica.
-
-Estas instancias deben contener un software específico para cada servicio que se despliega en ellas y que servirá para 
-
-Necesitaremos instalar en instancias separadas:
-
-- Nodo de cabecera (1 nodo):
- - NGINX o HAproxy
-- Nodos de servicio (1-2 nodos):
- - Servicio de contenedores (docker)
-- Nodo de Base de Datos (1 nodo)
-- Nodo para autenticacion (1 nodo)
 
 
 
