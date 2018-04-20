@@ -16,7 +16,23 @@ Material de prácticas de la asignatura: **https://github.com/manuparra/Practica
 
 <HR>
 
-# Sesión : Introduction to BigData and HDFS
+Table of contents:
+
+
+- [Sesion : Introduction to BigData and HDFS](#sesion---introduction-to-bigdata-and-hdfs)
+  * [Connecting to Hadoop Cluster UGR](#connecting-to-hadoop-cluster-ugr)
+  * [HDFS basics](#hdfs-basics)
+  * [HDFS storage space](#hdfs-storage-space)
+  * [Usage HDFS](#usage-hdfs)
+  * [Shell comands](#shell-comands)
+  * [Hands on](#hands-on)
+  * [HADOOP examples execution and HDFS](#hadoop-examples-execution-and-hdfs)
+  * [HDFS and HADOOP management](#hdfs-and-hadoop-management)
+    + [HDFS replication and blocks](#hdfs-replication-and-blocks)
+  * [Exercice](#exercice)
+- [References:](#references-)
+
+# Sesion : Introduction to BigData and HDFS
 
 ![LogoHadoop](https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAAmBAAAAJDgzYjM0N2VkLWQ0ZTEtNDQ0Zi05ZWEzLWVjOTgyMjdlN2Y0MA.jpg)
 
