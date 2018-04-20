@@ -546,6 +546,60 @@ hdfs dfs -rmr
 ```
 
 
+## HADOOP examples execution and HDFS
+
+Hadoop have a bunch of examples ready to execute. Those are simple bigdata applications on MAP-REDUCE paradigm.
+
+We are going to execute a WORD COUNT:
+
+```
+hadoop jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar wordcount INPUT_HDFS OUTPUT_HDFS
+```
+
+Use the book Odyssey - Homer as a INPUT of the Application; book located in HDFS ``/tmp/odyssey.txt``
+
+```
+hadoop jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar wordcount /tmp/odyssey.txt <OUTPUT in HDFS>
+```
+
+Tasks:
+
+- Merge results in one file.
+- Count the number of distinct words.
+
+
+
+
+## HDFS and HADOOP management
+
+NameNode WebUI, use XForward from atcstack:
+
+firefox http://localhost:50070/
+
+### HDFS replication and blocks
+
+When a file is written to HDFS, it is split up into big chucks called data blocks, whose size is controlled by the parameter dfs.block.size in the config file hdfs-site.xml. Each block is stored on one or more nodes, controlled by the parameter dfs.replication in the same file (in most of this post – set to 3, which is the default). Each copy of a block is called a replica.
+
+Configuration: 
+
+- Current block size configuration.
+- Current Replication factor configuration.
+
+Example:
+
+We have 300 MB of file need to store in HDFS then it will be distributed (128MB/block):
+
+```
+Block  * Replica
+ 128   *   3
+ 128   *   3
+  44   *   3
+```
+
+
+
+
+
 
 ## Exercice
 
