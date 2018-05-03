@@ -16,7 +16,7 @@ Material de prácticas de la asignatura: **https://github.com/manuparra/Practica
 
 <HR>
 
-# Apache Mahout - Hadoop
+# Sesión: Apache Mahout - Hadoop
 
 Apache Mahout es una biblioteca de algoritmos para el aprendizaje máquina escalable en Hadoop.
 
