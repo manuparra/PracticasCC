@@ -84,7 +84,7 @@ De forma adicional, cada una de las fases constan de tres etapas: 1 Inicial, 2 M
 Generar el fichero que describe al conjunto de datos:
 
 ```
-hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.tools.Describe -p /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff -f /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info -d N 3 C 37 N L
+hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.tools.Describe -p /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff -f kddcup_10_normal_versus_DOS-5-1tra.info -d N 3 C 37 N L
 ```
 
 de donde:
@@ -99,10 +99,7 @@ de donde:
 Ejecutar la aplicación (5 maps y 100 árboles):
 
 ```
-hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.mapreduce.BuildForest -Dmapreduce.input.fileinputformat.split.minsize=11886574 -Dmapreduce.input.fileinputformat.split.maxsize=11886574 -o output_kddcup_10_normal_versus_DOS
--d /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff
--ds /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
--sl 6 -p -t 100
+hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.mapreduce.BuildForest -Dmapreduce.input.fileinputformat.split.minsize=11886574 -Dmapreduce.input.fileinputformat.split.maxsize=11886574 -o output_kddcup_10_normal_versus_DOS -d /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff -ds kddcup_10_normal_versus_DOS-5-1tra.info -sl 6 -p -t 100
 ```
 
 de donde:
@@ -117,12 +114,7 @@ de donde:
 Usar el modelo generado en el paso anterior para clasificar nuevos datos:
 
 ```
-hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.mapreduce.TestForest
--i /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tst.arff
--ds /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
--m output_kddcup_10_normal_versus_DOS
--a -mr
--o predictions_kddcup_10_normal_versus_DOS
+hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.mapreduce.TestForest -i /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tst.arff -ds kddcup_10_normal_versus_DOS-5-1tra.info -m output_kddcup_10_normal_versus_DOS -a -mr -o predictions_kddcup_10_normal_versus_DOS
 ```
 
 de donde:
@@ -152,9 +144,7 @@ Este algoritmo consta de dos fases diferentes:
 ### Descriptor del fichero
 
 ```
-hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.tools.Describe
--p /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff
--f /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
+hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.tools.Describe -p /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff kddcup_10_normal_versus_DOS-5-1tra.info
 -d N 3 C 37 N L
 ```
 
@@ -170,19 +160,19 @@ BYTES_BY_PARTITION=$((FILE_SIZE/5)) MAX_BYTES_BY_PARTITION=$((BYTES_BY_PARTITION
 ### Calcular el número de instancias de la clase minoritaria (NPositiva)
 
 ```
-NPOS=( ‘hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff | grep ’,positive$’ | wc -l´)
+NPOS=( ‘hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff | grep ’,positive$’ | wc -l´)
 ```
 
 ### Calcular el número de instancias de la clase minoritaria (NNegativa)
 
 ```
-NNEG=( ‘hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff | grep ’,negative$’ | wc -l‘)
+NNEG=( ‘hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff | grep ’,negative$’ | wc -l‘)
 ```
 
 ### Ejecutar Random Oversampling (por ejemplo, 5 maps):
 
 ```
-hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.mapreduce.Resampling -Dmapreduce.input.fileinputformat.split.minsize=$BYTES_BY_PARTITION -Dmapreduce.input.fileinputformat.split.maxsize= $MAX_BYTES_BY_PARTITION -dp /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff -d output-ROS-kddcup_10_normal_versus_DOS -ds datasets/kddcup kddcup_10_normal_versus_DOS-5- 1tra.info -rs overs -p 5 -npos $NPOS -nneg $NNEG -negclass negative
+hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.mapreduce.Resampling -Dmapreduce.input.fileinputformat.split.minsize=$BYTES_BY_PARTITION -Dmapreduce.input.fileinputformat.split.maxsize= $MAX_BYTES_BY_PARTITION -dp /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff -d output-ROS-kddcup_10_normal_versus_DOS -ds kddcup_10_normal_versus_DOS-5-1tra.info -rs overs -p 5 -npos $NPOS -nneg $NNEG -negclass negative
 ```
 
 ### Verificar salida
