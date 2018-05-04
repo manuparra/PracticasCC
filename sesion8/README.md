@@ -84,9 +84,7 @@ De forma adicional, cada una de las fases constan de tres etapas: 1 Inicial, 2 M
 Generar el fichero que describe al conjunto de datos:
 
 ```
-hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.tools.Describe
--p datasets/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff 
--f datasets/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info -d N 3 C 37 N L
+hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.tools.Describe -p /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff -f /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info -d N 3 C 37 N L
 ```
 
 de donde:
@@ -102,8 +100,8 @@ Ejecutar la aplicación (5 maps y 100 árboles):
 
 ```
 hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.mapreduce.BuildForest -Dmapreduce.input.fileinputformat.split.minsize=11886574 -Dmapreduce.input.fileinputformat.split.maxsize=11886574 -o output_kddcup_10_normal_versus_DOS
--d datasets/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff
--ds datasets/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
+-d /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff
+-ds /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
 -sl 6 -p -t 100
 ```
 
@@ -120,8 +118,8 @@ Usar el modelo generado en el paso anterior para clasificar nuevos datos:
 
 ```
 hadoop jar /home/<user>/mahout-distribution-0.9.jar org.apache.mahout.classifier.df.mapreduce.TestForest
--i datasets/kddcup/kddcup_10_normal_versus_DOS-5- 1tst.arff
--ds datasets/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
+-i /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tst.arff
+-ds /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
 -m output_kddcup_10_normal_versus_DOS
 -a -mr
 -o predictions_kddcup_10_normal_versus_DOS
@@ -140,12 +138,106 @@ Comprobar la salida:
 hadoop fs -cat predictions_kddcup_10_normal_versus_DOS | head -n 10
 ```
 
+## Random Over Sampling
+
+Es un método no heurístico que intenta ajustar la distribución de clases a través de la replicación aleatoria de ejemplos en la clase minoritaria.
+
+Permite obtener un conjunto de datos con una distribución balanceada de clases mediante la replicación aleatoria de ejemplos de la clase minoritaria.
+
+Este algoritmo consta de dos fases diferentes:
+
+- 1 Fase Map: cada proceso map se encarga de balacear la distribución de clases de su partición mediante la replicación de instancias de la clase minoritaria
+- 2 Fase Reduce: se combinan cada una de las salidas de los maps para formar el conjunto de datos final ya balanceado
+
+### Descriptor del fichero
+
+```
+hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.tools.Describe
+-p /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff
+-f /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.info
+-d N 3 C 37 N L
+```
+
+### Calculo del split
+
+Calcular el tamaño del split (por ejemplo, 5 maps) [shell script]
+
+```
+FILE_SIZE=( ´hadoop fs -ls /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff | awk ’{print $5}’‘)
+BYTES_BY_PARTITION=$((FILE_SIZE/5)) MAX_BYTES_BY_PARTITION=$((BYTES_BY_PARTITION+1))
+```
+
+### Calcular el número de instancias de la clase minoritaria (NPositiva)
+
+```
+NPOS=( ‘hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff | grep ’,positive$’ | wc -l´)
+```
+
+### Calcular el número de instancias de la clase minoritaria (NNegativa)
+
+```
+NNEG=( ‘hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff | grep ’,negative$’ | wc -l‘)
+```
+
+### Ejecutar Random Oversampling (por ejemplo, 5 maps):
+
+```
+hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.mapreduce.Resampling -Dmapreduce.input.fileinputformat.split.minsize=$BYTES_BY_PARTITION -Dmapreduce.input.fileinputformat.split.maxsize= $MAX_BYTES_BY_PARTITION -dp /tmp/kddcup/kddcup_10_normal_versus_DOS-5- 1tra.arff -d output-ROS-kddcup_10_normal_versus_DOS -ds datasets/kddcup kddcup_10_normal_versus_DOS-5- 1tra.info -rs overs -p 5 -npos $NPOS -nneg $NNEG -negclass negative
+```
+
+### Verificar salida
+
+Comprobar la salida. El fichero de salida tendrá el nombre "part-r-00000".
+
+```
+hadoop fs -ls output-ROS-kddcup_10_normal_versus_DOS
+```
+
+
+## Script (copiable/pegable) para ROS
+
+```
+Ejemplo de uso: Implementación MapReduce para Random Oversampling
+
+#1. Generar el fichero que describe al conjunto de datos
+
+hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.tools.Describe -p /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff  -f /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.info -d N 3 C 37 N L
+
+#2. Calcular el tamaño del split (por ejemplo, 5 maps)
+
+FILE_SIZE=( `hadoop fs -ls /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff | awk '{print $5}'`)
+
+BYTES_BY_PARTITION=$((FILE_SIZE/5))
+
+MAX_BYTES_BY_PARTITION=$((BYTES_BY_PARTITION+1))
+
+#3. Calcular el número de instancias de la clase minoritaria o menos representativa. En este ejemplo, "positive" es el nombre la clase asociada a la clase minoritaria
+
+NPOS=( `hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff | grep ',positive$' | wc -l`)
+
+#3. Calcular el número de instancias de la clase mayoritaria. En este ejemplo, "negative" es el nombre la clase asociada a la clase mayoritaria
+
+NNEG=( `hadoop fs -cat /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff | grep ',negative$' | wc -l`)
+
+#4. Ejecutar Random Oversampling (por ejemplo, 5 maps)
+
+hadoop jar mahout-distribution-sige.jar org.apache.mahout.classifier.df.mapreduce.Resampling -Dmapreduce.input.fileinputformat.split.minsize=$BYTES_BY_PARTITION -Dmapreduce.input.fileinputformat.split.maxsize=$MAX_BYTES_BY_PARTITION -dp /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.arff -d output-ROS-kddcup_10_normal_versus_DOS -ds /tmp/kddcup/kddcup_10_normal_versus_DOS-5-1tra.info -rs overs -p 5 -npos $NPOS -nneg $NNEG -negclass negative -tm ROS-kddcup_10_normal_versus_DOS-build_time
+
+#5. Comprobar la salida. El fichero de salida tendrá el nombre "part-r-00000"
+
+hadoop fs -ls output-ROS-kddcup_10_normal_versus_DOS
+
+
+
+```
+
 
 # Referencias:
 
 - Apache Mahout: http://mahout.apache.org/
 - Random Forest MapReduce implementation in Mahout: http://mahout.apache.org/users/classification/partial- implementation.html
 - UCI Machine Learning Repository - KDD Cup dataset: https://archive.ics.uci.edu/ml/datasets/KDD+Cup+1999+Data
+- S. Río, V. López, J.M. Benítez, F. Herrera. On the use of MapReduce for Imbalanced Big Data using Random Forest. Information Sciences 285 (2014) 112-137. doi: 10.1016/j.ins.2014.03.043 http://sci2s.ugr.es/sites/default/files/ficherosPublicaciones/1742_2014-delRio-INS.pdf
 
 
 
